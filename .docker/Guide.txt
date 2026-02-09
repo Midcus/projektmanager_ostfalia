@@ -1,0 +1,24 @@
+Installieren bei Windows:
+
+    Docker: 
+    -https://www.docker.com/products/docker-desktop/ 
+    -Run Docker Setup: Enable WSL 2 instead of Hyper-V 
+    -cmd: "wsl --install" 
+    -cmd: "wsl --set-default-version 2"
+
+    Run Container: 
+    -cd Path/To/The/Folder/ostfalia-thesismanagement/ 
+    -cmd: "docker build -t thesismanagement ." 
+    -Check: cmd: "docker images" 
+    -cmd: "docker run -d -p 8080:80 --name mycontainer myapp" 
+    -"http://127.0.0.1:8080/"
+
+    Prof Account: profsimon54@ostfalia.de admin123
+
+		prof1@ostfalia.de admin123
+
+    Admin Account admin10@ostfalia.de 123456789
+
+    Student Account id110690@ostfalia.de 12345678Aa!
+
+		id123456@ostfalia.de 12345678Aa!

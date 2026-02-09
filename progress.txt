@@ -1,0 +1,4 @@
+Looix upload
+
+rm public/storage
+php artisan storage:link

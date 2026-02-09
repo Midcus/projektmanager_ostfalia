@@ -1,0 +1,12 @@
+
+/vendor/
+/storage/api-docs/
+/swagger.json
+/test.php
+/resources/views/vendor/
+
+
+.env
+.env.*
+.docker/.env*
+docker/.env*

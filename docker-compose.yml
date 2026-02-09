@@ -1,0 +1,19 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    network_mode: host
+    volumes:
+      - .:/var/www/html
+      - /var/storage:/var/www/html/storage/app/public
+
+    environment:
+      - APACHE_DOCUMENT_ROOT=/var/www/html/public
+
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+
