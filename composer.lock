@@ -885,16 +885,16 @@
         },
         {
             "name": "getbrevo/brevo-php",
-            "version": "v2.0.4",
+            "version": "v2.0.14",
             "source": {
                 "type": "git",
                 "url": "https://github.com/getbrevo/brevo-php.git",
-                "reference": "f4741eece5eacb96192417b06080abf43f47c44e"
+                "reference": "1abb1b75e06aa2ca3a6893d8e8d1968a8a76dc3f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/getbrevo/brevo-php/zipball/f4741eece5eacb96192417b06080abf43f47c44e",
-                "reference": "f4741eece5eacb96192417b06080abf43f47c44e",
+                "url": "https://api.github.com/repos/getbrevo/brevo-php/zipball/1abb1b75e06aa2ca3a6893d8e8d1968a8a76dc3f",
+                "reference": "1abb1b75e06aa2ca3a6893d8e8d1968a8a76dc3f",
                 "shasum": ""
             },
             "require": {
@@ -942,9 +942,9 @@
             ],
             "support": {
                 "issues": "https://github.com/getbrevo/brevo-php/issues",
-                "source": "https://github.com/getbrevo/brevo-php/tree/v2.0.4"
+                "source": "https://github.com/getbrevo/brevo-php/tree/v2.0.14"
             },
-            "time": "2025-01-16T07:38:38+00:00"
+            "time": "2025-11-06T10:13:45+00:00"
         },
         {
             "name": "graham-campbell/result-type",
