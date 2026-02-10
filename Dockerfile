@@ -10,7 +10,7 @@ RUN apt-get update && apt-get install -y \
     libcurl4-openssl-dev \
     unzip \
     cron \
-    default-mysql-client \ 
+    default-mysql-client \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
     && docker-php-ext-install -j$(nproc) \
     pdo_mysql \
@@ -37,7 +37,6 @@ COPY . /var/www/html
 RUN composer install --optimize-autoloader --no-dev
 
 
-RUN composer require getbrevo/brevo-php
 
 COPY .docker/apache.conf /etc/apache2/sites-available/000-default.conf
 RUN a2enmod rewrite
