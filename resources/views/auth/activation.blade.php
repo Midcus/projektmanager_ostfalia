@@ -188,7 +188,7 @@
                         <button type="submit" class="button-24">Aktivieren</button>
                     </form>
 
-                    @if(Session::get('resend_attempts', 0) >= 5)
+                    @if(config('app.recaptcha.enabled') && Session::get('resend_attempts', 0) >= 5)
                         <form method="GET" action="{{ route('activation.resend') }}" class="mt-3">
                             <div class="mb-3">
                                 <div class="g-recaptcha" data-sitekey="{{ config('app.recaptcha.site_key') }}"></div>
@@ -208,6 +208,9 @@
         </div>
     </div>
 
-    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+    @if(config('app.recaptcha.enabled'))
+        <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+    @endif
+
 </body>
 </html>

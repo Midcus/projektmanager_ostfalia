@@ -169,7 +169,7 @@
                             @enderror
                         </div>
 
-                        @if(Session::get('email_attempts_' . old('email', '')) >= 5)
+                        @if(config('app.recaptcha.enabled') && Session::get('email_attempts_' . old('email', '')) >= 5)
                             <div class="mb-3">
                                 <div class="g-recaptcha" data-sitekey="{{ config('app.recaptcha.site_key') }}"></div>
                                 @error('g-recaptcha-response')
@@ -185,6 +185,9 @@
         </div>
     </div>
 
-    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+    @if(config('app.recaptcha.enabled'))
+        <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+    @endif
+
 </body>
 </html>

@@ -76,7 +76,7 @@ class PasswordResetController extends Controller
         $emailAttemptsKey = 'email_attempts_' . $email;
         $emailAttempts = Session::get($emailAttemptsKey, 0);
 
-        if ($emailAttempts >= 5) {
+        if (config('app.recaptcha.enabled') && $emailAttempts >= 5) {
             $validator = Validator::make($request->all(), [
                 'g-recaptcha-response' => 'required',
             ], [
@@ -197,7 +197,7 @@ class PasswordResetController extends Controller
         $verifyAttemptsKey = 'verify_reset_attempts_' . $email;
         $verifyAttempts = Session::get($verifyAttemptsKey, 0);
 
-        if ($verifyAttempts >= 5) {
+        if (config('app.recaptcha.enabled') && $verifyAttempts >= 5) {
             $validator = Validator::make($request->all(), [
                 'g-recaptcha-response' => 'required',
             ], [
@@ -326,7 +326,7 @@ class PasswordResetController extends Controller
         $emailAttemptsKey = 'email_attempts_' . $email;
         $emailAttempts = Session::get($emailAttemptsKey, 0);
 
-        if ($emailAttempts >= 5) {
+        if (config('app.recaptcha.enabled') && $emailAttempts >= 5) {
             $validator = Validator::make($request->all(), [
                 'g-recaptcha-response' => 'required',
             ], [
@@ -355,7 +355,7 @@ class PasswordResetController extends Controller
         $resendAttemptsKey = 'resend_attempts_' . $email;
         $resendAttempts = Session::get($resendAttemptsKey, 0);
 
-        if ($resendAttempts >= 5) {
+        if (config('app.recaptcha.enabled') && $resendAttempts >= 5) {
             $validator = Validator::make($request->all(), [
                 'g-recaptcha-response' => 'required',
             ], [

@@ -1,19 +1,41 @@
-version: '3.8'
-
 services:
   app:
     build:
       context: .
       dockerfile: Dockerfile
-    network_mode: host
+    ports:
+      - "85:80"
     volumes:
       - .:/var/www/html
-      - /var/storage:/var/www/html/storage/app/public
-
+      - vendor:/var/www/html/vendor
+    env_file:
+      - .env
     environment:
-      - APACHE_DOCUMENT_ROOT=/var/www/html/public
+      APACHE_DOCUMENT_ROOT: /var/www/html/public
+      MAIL_MAILER: ${MAIL_MAILER}
+      BREVO_API_KEY: ${BREVO_API_KEY}
+      MAIL_FROM_ADDRESS: ${MAIL_FROM_ADDRESS}
+      MAIL_FROM_NAME: ${MAIL_FROM_NAME}
+    depends_on:
+      - db
 
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
+  db:
+    image: mysql:8.0
+    environment:
+      MYSQL_DATABASE: ${DB_DATABASE}
+      MYSQL_USER: ${DB_USERNAME}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
 
+    volumes:
+      - mysql-data:/var/lib/mysql
+      - ./.docker/init.sql:/docker-entrypoint-initdb.d/01-init.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -uroot -p$${MYSQL_ROOT_PASSWORD} --silent"]
+      interval: 5s
+      timeout: 3s
+      retries: 30
 
+volumes:
+  mysql-data:
+  vendor:

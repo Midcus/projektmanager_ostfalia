@@ -6,7 +6,10 @@
     <title>Login</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 
-    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+    @if(config('app.recaptcha.enabled'))
+        <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+    @endif
+
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -245,7 +248,7 @@
 
                         <p id="loginAttempts" style="display: none;">Login Attempts: {{ session('login_attempts', 0) }}</p>
 
-                        @if(session('login_attempts', 0) >= 2)
+                        @if(config('app.recaptcha.enabled') && session('login_attempts', 0) >= 2)
                             <div class="mb-3">
                                 <div class="g-recaptcha" data-sitekey="{{ config('app.recaptcha.site_key') }}"></div>
                                 @error('g-recaptcha-response')

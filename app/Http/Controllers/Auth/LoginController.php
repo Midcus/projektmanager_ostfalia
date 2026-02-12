@@ -85,7 +85,8 @@ class LoginController extends Controller
         $attempts = $request->session()->get('login_attempts', 0);
         \Log::info('Login Attempts before validation: ' . $attempts); // Debug before validate
     
-        $requireCaptcha = $attempts >= 2;
+        $requireCaptcha = config('app.recaptcha.enabled') && $attempts >= 2;
+
         $rules = [
             'email' => ['required', 'string', 'email'],
             'password' => ['required', 'string'],
