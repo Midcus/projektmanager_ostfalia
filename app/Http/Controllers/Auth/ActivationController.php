@@ -85,7 +85,7 @@ class ActivationController extends Controller
             'activation_code' => 'required|string|size:6',
         ]);
 
-        if ($attempts >= 5) {
+        if (config('app.recaptcha.enabled') && $attempts >= 5) {
             $request->validate([
                 'g-recaptcha-response' => 'required',
             ]);
@@ -219,7 +219,7 @@ class ActivationController extends Controller
             return redirect()->route('resend.form')->withErrors(['email' => 'Konto bereits aktiviert oder nicht gefunden.']);
         }
 
-        if ($attempts >= 5) {
+        if (config('app.recaptcha.enabled') && $attempts >= 5) {
             $request->validate([
                 'g-recaptcha-response' => 'required',
             ]);

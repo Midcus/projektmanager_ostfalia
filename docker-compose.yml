@@ -8,8 +8,6 @@ services:
     volumes:
       - .:/var/www/html
       - vendor:/var/www/html/vendor
-    env_file:
-      - .env
     environment:
       APACHE_DOCUMENT_ROOT: /var/www/html/public
       MAIL_MAILER: ${MAIL_MAILER}
