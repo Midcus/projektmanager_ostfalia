@@ -139,7 +139,7 @@ class RegisterController extends Controller
         }
 
         $activationCode = str_pad(rand(0, 999999), 6, '0', STR_PAD_LEFT);
-        Log::info('Generated activation code: ' . $activationCode);
+        Log::info('Generated activation code');
 
         try {
             $user = User::create([

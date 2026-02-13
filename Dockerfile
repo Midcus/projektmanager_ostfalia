@@ -34,10 +34,7 @@ WORKDIR /var/www/html
 COPY . /var/www/html
 
 
-RUN composer install --optimize-autoloader --no-dev
 
-
-RUN composer require getbrevo/brevo-php
 
 COPY .docker/apache.conf /etc/apache2/sites-available/000-default.conf
 RUN a2enmod rewrite

@@ -4,6 +4,7 @@ namespace App\Console;
 
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
+use Illuminate\Support\Facades\Log;
 
 class Kernel extends ConsoleKernel
 {
@@ -16,20 +17,8 @@ class Kernel extends ConsoleKernel
         $schedule->command('interests:clean-expired')
                  ->daily()
                  ->appendOutputTo(storage_path('logs/cron.log'))
-                 ->onSuccess(function () {
-                     file_put_contents(
-                         '/home/khoituanh/cron-error.log',
-                         '[' . now()->toDateTimeString() . '] interests:clean-expired executed successfully' . PHP_EOL,
-                         FILE_APPEND
-                     );
-                 })
-                 ->onFailure(function () {
-                     file_put_contents(
-                         '/home/khoituanh/cron-error.log',
-                         '[' . now()->toDateTimeString() . '] interests:clean-expired failed' . PHP_EOL,
-                         FILE_APPEND
-                     );
-                 });
+                 ->onSuccess(fn () => Log::info('interests:clean-expired OK'))
+                 ->onFailure(fn () => Log::error('interests:clean-expired FAILED'));
     }
 
 
