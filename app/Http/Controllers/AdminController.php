@@ -36,9 +36,16 @@ class AdminController extends Controller
      *     )
      * )
      */
-    public function dashboard()
+    public function dashboard(Request $request)
     {
-        $users = User::all();
+        $users = User::select('id', 'praefix', 'name', 'nachname', 'email', 'roll')
+            ->when($request->filled('search'), function($q) use ($request) {
+                $q->where('name', 'like', '%' . $request->search . '%')
+                ->orWhere('email', 'like', '%' . $request->search . '%')
+                ->orWhere('roll', $request->search);
+            })
+            ->get();
+
         return view('admin-dashboard', compact('users'));
     }
 
