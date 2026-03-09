@@ -138,7 +138,7 @@ class RegisterController extends Controller
             return back()->withErrors(['internal_code' => 'Der interne Code ist für die ausgewählte Rolle falsch.'])->withInput();
         }
 
-        $activationCode = str_pad(rand(0, 999999), 6, '0', STR_PAD_LEFT);
+        $activationCode = str_pad(random_int(0, 999999), 6, '0', STR_PAD_LEFT);
         Log::info('Generated activation code');
 
         try {
@@ -153,7 +153,7 @@ class RegisterController extends Controller
                 'activation_expires_at' => now()->addHours(24),
                 'is_activated' => false,
             ]);
-            Log::info('User created with activation_code: ' . $user->activation_code);
+            Log::info('User created successfully for email: ' . $user->email);
         } catch (\Exception $e) {
             Log::error('Failed to create user: ' . $e->getMessage());
             return back()->withErrors(['error' => 'Fehler beim Erstellen des Benutzers. Bitte versuchen Sie es erneut.'])->withInput();

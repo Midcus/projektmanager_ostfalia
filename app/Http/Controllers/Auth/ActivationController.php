@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\Cache;
 use App\Mail\ActivationEmail;
 use Illuminate\Support\Facades\Mail;
 use OpenApi\Annotations as OA;
@@ -72,13 +72,8 @@ class ActivationController extends Controller
      */
     public function verify(Request $request)
     {
-        $attempts = Session::get('verify_attempts_' . $request->email, 0);
-        $lastAttemptTime = Session::get('last_verify_time_' . $request->email, now()->subHour()->toDateTimeString());
-
-        if (now()->diffInMinutes($lastAttemptTime) >= 60) {
-            Session::put('verify_attempts_' . $request->email, 0);
-            $attempts = 0;
-        }
+        $cacheKey = 'verify_attempts_' . $request->ip() . '_' . $request->email;
+        $attempts = Cache::get($cacheKey, 0);
 
         $request->validate([
             'email' => 'required|email|exists:users,email',
@@ -98,8 +93,7 @@ class ActivationController extends Controller
 
             if (!$response['success']) {
                 Log::warning('reCAPTCHA verification failed for activation attempt for email: ' . $request->email);
-                Session::put('verify_attempts_' . $request->email, $attempts + 1);
-                Session::put('last_verify_time_' . $request->email, now()->toDateTimeString());
+                Cache::put($cacheKey, $attempts + 1, now()->addMinutes(60));
                 return back()->withErrors(['g-recaptcha-response' => 'reCAPTCHA verification failed.']);
             }
         }
@@ -111,15 +105,13 @@ class ActivationController extends Controller
 
         if (!$user) {
             Log::warning('Invalid activation attempt for email: ' . $request->email);
-            Session::put('verify_attempts_' . $request->email, $attempts + 1);
-            Session::put('last_verify_time_' . $request->email, now()->toDateTimeString());
+            Cache::put($cacheKey, $attempts + 1, now()->addMinutes(60));
             return back()->withErrors(['activation_code' => 'Ungültiger oder abgelaufener Aktivierungscode.']);
         }
 
         if ($user->is_activated) {
             Log::info('Account already activated for email: ' . $request->email);
-            Session::forget('verify_attempts_' . $request->email);
-            Session::forget('last_verify_time_' . $request->email);
+            Cache::forget($cacheKey);
             return redirect()->route('login')->with('success', 'Ihr Konto ist bereits aktiviert. Bitte loggen Sie sich ein.');
         }
 
@@ -130,12 +122,10 @@ class ActivationController extends Controller
                 'activation_expires_at' => null,
             ]);
             Log::info('Account activated successfully for email: ' . $request->email);
-            Session::forget('verify_attempts_' . $request->email);
-            Session::forget('last_verify_time_' . $request->email);
+            Cache::forget($cacheKey);
         } catch (\Exception $e) {
             Log::error('Failed to activate account for email: ' . $request->email . ' - Error: ' . $e->getMessage());
-            Session::put('verify_attempts_' . $request->email, $attempts + 1);
-            Session::put('last_verify_time_' . $request->email, now()->toDateTimeString());
+            Cache::put($cacheKey, $attempts + 1, now()->addMinutes(60));
             return back()->withErrors(['error' => 'Fehler beim Aktivieren des Kontos. Bitte versuchen Sie es erneut.']);
         }
 
@@ -199,13 +189,8 @@ class ActivationController extends Controller
      */
     public function resend(Request $request)
     {
-        $attempts = Session::get('resend_attempts_' . $request->email, 0);
-        $lastResendTime = Session::get('last_resend_time_' . $request->email, now()->subHour()->toDateTimeString());
-
-        if (now()->diffInMinutes($lastResendTime) >= 60) {
-            Session::put('resend_attempts_' . $request->email, 0);
-            $attempts = 0;
-        }
+        $cacheKey = 'resend_attempts_' . $request->ip() . '_' . $request->email;
+        $attempts = Cache::get($cacheKey, 0);
 
         $request->validate([
             'email' => 'required|email|exists:users,email',
@@ -232,23 +217,22 @@ class ActivationController extends Controller
 
             if (!$response['success']) {
                 Log::warning('reCAPTCHA verification failed for resend code attempt for email: ' . $email);
-                Session::put('resend_attempts_' . $request->email, $attempts + 1);
-                Session::put('last_resend_time_' . $request->email, now()->toDateTimeString());
+                Cache::put($cacheKey, $attempts + 1, now()->addMinutes(60));
                 return redirect()->route('resend.form')->withErrors(['g-recaptcha-response' => 'reCAPTCHA verification failed.']);
             }
         }
 
-        $activationCode = str_pad(rand(0, 999999), 6, '0', STR_PAD_LEFT);
+        $activationCode = str_pad(random_int(0, 999999), 6, '0', STR_PAD_LEFT);
+
         try {
             $user->update([
                 'activation_code' => $activationCode,
                 'activation_expires_at' => now()->addHours(24),
             ]);
-            Log::info('New activation code generated for email: ' . $email . ' - Code: ' . $activationCode);
+            Log::info('Activation code generated for email: ' . $email);
         } catch (\Exception $e) {
             Log::error('Failed to update activation code for email: ' . $email . ' - Error: ' . $e->getMessage());
-            Session::put('resend_attempts_' . $request->email, $attempts + 1);
-            Session::put('last_resend_time_' . $request->email, now()->toDateTimeString());
+            Cache::put($cacheKey, $attempts + 1, now()->addMinutes(60));
             return redirect()->route('resend.form')->withErrors(['error' => 'Fehler beim Generieren eines neuen Codes. Bitte versuchen Sie es erneut.']);
         }
 
@@ -257,13 +241,11 @@ class ActivationController extends Controller
             Log::info('Activation email resent successfully to: ' . $user->email);
         } catch (\Exception $e) {
             Log::error('Failed to resend activation email to: ' . $user->email . ' - Error: ' . $e->getMessage());
-            Session::put('resend_attempts_' . $request->email, $attempts + 1);
-            Session::put('last_resend_time_' . $request->email, now()->toDateTimeString());
+            Cache::put($cacheKey, $attempts + 1, now()->addMinutes(60));
             return redirect()->route('resend.form')->withErrors(['email' => 'Fehler beim Senden der Aktivierungs-E-Mail. Bitte versuchen Sie es erneut.']);
         }
 
-        Session::put('resend_attempts_' . $request->email, $attempts + 1);
-        Session::put('last_resend_time_' . $request->email, now()->toDateTimeString());
+        Cache::put($cacheKey, $attempts + 1, now()->addMinutes(60));
         Log::info('Resend attempts updated for email: ' . $email . ' - Attempts: ' . ($attempts + 1));
 
         return redirect()->route('resend.form')->with('success', 'Ein neuer Aktivierungscode wurde gesendet.');
