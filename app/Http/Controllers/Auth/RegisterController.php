@@ -159,6 +159,28 @@ class RegisterController extends Controller
             return back()->withErrors(['error' => 'Fehler beim Erstellen des Benutzers. Bitte versuchen Sie es erneut.'])->withInput();
         }
 
+
+        // =====================================================
+        // DEMO MODE: Auto-activate, skip email sending
+        // =====================================================
+        if (env('DEMO_MODE', false)) {
+            try {
+                $user->update([
+                    'is_activated' => true,
+                    'activation_code' => null,
+                    'activation_expires_at' => null,
+                ]);
+                Log::info('Demo mode: User auto-activated for email: ' . $user->email);
+            } catch (\Exception $e) {
+                Log::error('Demo mode: Failed to auto-activate user: ' . $e->getMessage());
+                return back()->withErrors(['error' => 'Fehler beim Aktivieren des Kontos.'])->withInput();
+            }
+
+            return redirect()->route('login')
+                ->with('success', 'Demo-Modus: Konto wurde automatisch aktiviert. Bitte loggen Sie sich ein.');
+        }
+        // =====================================================
+
         try {
             Mail::to($user->email)->send(new ActivationEmail($activationCode));
         } catch (\Exception $e) {
