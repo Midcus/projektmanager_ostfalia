@@ -94,12 +94,14 @@ class ThesisController extends Controller
             $query->where('status', $status);
         }
     
-        $theses = $query->paginate(15)->appends($request->query());
-    
+        $theses = $query->with('interestedUsers')->paginate(15)->appends($request->query());
+
         $theses->each(function ($thesis) {
-            $thesis->interesse = $thesis->interestedUsers->pluck('email')->map(function ($email) {
-                return explode('@', $email)[0];
-            })->all();
+            $thesis->interesse = $thesis->interestedUsers   
+                ->pluck('email')
+                ->map(function ($email) {
+                    return explode('@', $email)[0];
+                })->all();
         });
     
         return view('prof-dashboard', compact('theses'));
@@ -407,7 +409,7 @@ class ThesisController extends Controller
         $thesis = Thesis::findOrFail($id);
         $user = Auth::user();
 
-        if ($thesis->interestedUsers->contains($user->id)) {
+        if ($thesis->interestedUsers()->where('user_id', $user->id)->exists()) {
             $thesis->interestedUsers()->detach($user->id);
             return redirect()->back()->with('success', 'Ihr Interesse wurde erfolgreich zurückgezogen.');
         } else {
@@ -709,12 +711,16 @@ class ThesisController extends Controller
     public function merkliste()
     {
         $user = Auth::user();
-        $theses = $user->interestedTheses()->get();
-    
+        $theses = $user->interestedTheses()
+                    ->with('interestedUsers') 
+                    ->get();
+
         $theses->each(function ($thesis) {
-            $thesis->interesse = $thesis->interestedUsers->pluck('email')->map(function ($email) {
-                return explode('@', $email)[0];
-            })->all();
+            $thesis->interesse = $thesis->interestedUsers 
+                ->pluck('email')
+                ->map(function ($email) {
+                    return explode('@', $email)[0];
+                })->all();
         });
     
         return view('student.merkliste', compact('theses'));
@@ -758,12 +764,15 @@ class ThesisController extends Controller
     public function geheimthesis()
     {
         $theses = Thesis::where('prof_id', auth()->user()->id)
-                        ->where('geheim', 'yes')
-                        ->paginate(15);
+                ->where('geheim', 'yes')
+                ->with(['interestedUsers' => function ($q) { 
+                    $q->wherePivot('expires_at', '>', now());
+                }])
+                ->paginate(15);
+
 
         $theses->each(function ($thesis) {
-            $thesis->interesse = $thesis->interestedUsers()
-                ->wherePivot('expires_at', '>', now())
+            $thesis->interesse = $thesis->interestedUsers 
                 ->pluck('email')
                 ->map(function ($email) {
                     return explode('@', $email)[0];

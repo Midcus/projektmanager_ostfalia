@@ -158,7 +158,9 @@ class HomeController extends Controller
             }
         }
 
-        $theses = $query->paginate(20)->appends($request->query());
+        $theses = $query->with(['interestedUsers' => function ($q) {
+            $q->wherePivot('expires_at', '>', now()); 
+        }])->paginate(20)->appends($request->query());
 
         $theses->each(function ($thesis) {
             if (!Auth::check() || (Auth::check() && Auth::user()->roll === 'Student')) {
@@ -168,16 +170,13 @@ class HomeController extends Controller
             }
 
             if (Auth::check()) {
-                $thesis->interesse = $thesis->interestedUsers()
-                    ->wherePivot('expires_at', '>', now())
+                $thesis->interesse = $thesis->interestedUsers 
                     ->pluck('email')
                     ->map(function ($email) {
                         return explode('@', $email)[0];
                     })->all();
             } else {
-                $thesis->interesse = $thesis->interestedUsers()
-                    ->wherePivot('expires_at', '>', now())
-                    ->count();
+                $thesis->interesse = $thesis->interestedUsers->count(); 
             }
         });
 
