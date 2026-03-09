@@ -141,7 +141,7 @@ CREATE TABLE `theses` (
   `kenntnisse` text COLLATE utf8mb4_unicode_ci NOT NULL,
   `notiz` text COLLATE utf8mb4_unicode_ci,
   `semester` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `status` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `status` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `geheim` enum('yes','no') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'no',
   `vortragdatum` date DEFAULT NULL,
   `startdatum` date DEFAULT NULL,

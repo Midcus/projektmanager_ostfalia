@@ -276,7 +276,7 @@
                             <th class="sortable" data-column="3">Nachname ⇅</th>
                             <th class="sortable" data-column="4">Email ⇅</th>
                             <th class="sortable" data-column="5">Role ⇅</th>
-                            <th>Actions</th>
+                            <th>Aktionen</th>
                         </tr>
                         <tr>
                             <td><input type="text" class="search-input" data-column="0" placeholder="🔍"></td>
@@ -299,7 +299,7 @@
                                 <td>{{ $user->roll }}</td>
                                 <td>
                                     @if(auth()->user()->id !== $user->id) 
-                                        <form action="{{ route('admin.delete-user', $user->id) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this user?');">
+                                        <form action="{{ route('admin.delete-user', $user->id) }}" method="POST" onsubmit="return confirm('Möchten Sie diesen Benutzer wirklich löschen?');">
                                             @csrf
                                             @method('DELETE')
                                             <button type="submit" class="btn btn-danger">Delete</button>
