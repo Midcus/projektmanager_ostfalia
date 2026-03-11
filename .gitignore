@@ -6,7 +6,3 @@
 /resources/views/vendor/
 
 
-.env
-.env.*
-.docker/.env*
-docker/.env*
