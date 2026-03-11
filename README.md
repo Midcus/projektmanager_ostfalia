@@ -100,9 +100,9 @@ http://localhost:85
 
 | Role | Email | Password |
 |------|-------|----------|
-| Admin | admin10@ostfalia.de | 123456789 |
-| Professor | profsimon54@ostfalia.de | admin123 |
-| Student | id123456@ostfalia.de | 12345678Aa! |
+| Admin | id999888@ostfalia.de | 123456789 |
+| Professor | id543026@ostfalia.de | Prof2025! |
+| Student | id123456@ostfalia.de | Student2025! |
 
 ---
 ## Demo Mode
